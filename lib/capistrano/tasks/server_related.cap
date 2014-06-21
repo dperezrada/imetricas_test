@@ -1,0 +1,159 @@
+namespace :server do
+
+  namespace :setup do
+
+    desc "Update apt-get sources"
+    task :update_apt_get do
+      on roles(:sysadmin) do
+        sudo "apt-get update"
+      end
+    end
+
+    desc "Install Needed Tools"
+    task :install_needed_tools do
+      on roles(:web) do
+        sudo "apt-get install build-essential dialog libssl-dev curl git-core git-svn sqlite3 libsqlite3-dev -y"
+      end
+    end
+
+    desc "Install rbenv"
+    task :install_rbenv do
+      on roles(:web) do
+        execute "pwd"
+        execute "curl https://raw.githubusercontent.com/fesplugas/rbenv-installer/master/bin/rbenv-installer | bash > /dev/null"
+        rbenv_in_profile = capture("grep 'rbenv init' ~/.bashrc | wc | awk '{print $1}'").to_i > 0
+        unless rbenv_in_profile
+          execute 'echo \'export PATH="$HOME/.rbenv/bin:$PATH"\' >> ~/.bashrc
+                echo \'eval "$(rbenv init -)"\' >> ~/.bashrc'
+          execute 'source ~/.bashrc'
+        end
+
+        gem_in_profile = capture("grep 'gem: --no-ro' ~/.gemrc| wc | awk '{print $1}'").to_i > 0
+        unless gem_in_profile
+          execute 'echo \'gem: --no-ri --no-rdoc\' >> ~/.gemrc'
+        end
+      end
+    end
+
+    desc "Install ruby"
+    task :install_ruby do
+      on roles(:web) do
+        version_is_installed = capture("/home/deploy/.rbenv/bin/rbenv versions | grep ' 2.1.0 ' | wc -l").to_i > 0
+        unless version_is_installed
+          execute "/home/deploy/.rbenv/bin/rbenv install 2.1.0 -v"
+        end
+        execute "/home/deploy/.rbenv/bin/rbenv global 2.1.0"
+      end
+    end
+
+    desc "Install node"
+    task :install_node do
+      on roles(:sysadmin) do
+        sudo "apt-get install python-software-properties python g++ make -y"
+        sudo "add-apt-repository ppa:chris-lea/node.js -y"
+        sudo "apt-get update -y"
+        sudo "apt-get install nodejs -y"
+      end
+    end
+
+    desc "Install rails dependencies"
+    task :install_rails_dependencies do
+      on roles(:web) do
+        execute "/home/deploy/.rbenv/shims/gem install bundler"
+      end
+    end
+
+    desc "Install nginx"
+    task :install_nginx do
+      on roles(:sysadmin) do
+        sudo "apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ABF5BD827BD9BF62"
+        contains_nginx_source = capture("cat /etc/apt/sources.list | grep nginx | wc -l ").to_i > 0
+        unless contains_nginx_source
+          execute "echo 'echo \"deb http://nginx.org/packages/ubuntu/ precise nginx\" | sudo tee -a /etc/apt/sources.list' | sh"
+          sudo "apt-get update"
+        end
+        sudo "apt-get install nginx -y"
+      end
+    end
+
+    desc "Install Java (requirement for Elasticsearch)"
+    task :install_java do
+      on roles(:sysadmin) do
+        sudo "apt-get install openjdk-7-jre -y"
+      end
+    end
+
+    desc "Install Elasticsearch"
+    task :install_elasticsearch do
+      on roles(:sysadmin) do
+        execute "wget -O - http://packages.elasticsearch.org/GPG-KEY-elasticsearch | sudo apt-key add -"
+        contains_source = capture("cat /etc/apt/sources.list | grep elasticsearch | wc -l").to_i > 0
+        unless contains_source
+          execute "echo 'deb http://packages.elasticsearch.org/elasticsearch/1.0/debian stable main' | sudo tee -a /etc/apt/sources.list"
+          sudo "apt-get update"
+        end
+        sudo "apt-get install elasticsearch -y"
+      end
+    end
+
+    desc "Install Redis"
+    task :install_redis do
+      on roles(:sysadmin) do
+        sudo "apt-get install -y redis-server"
+      end
+    end
+
+    desc "Install unattended-upgrade package (for security updates)"
+    task :install_unattended_upgrade do
+      on roles(:sysadmin) do
+        sudo "apt-get install -y unattended-upgrades"
+      end
+    end
+
+    desc "Copy nginx configuration into the server"
+    task :copy_nginx_config do
+      on roles(:sysadmin) do
+        sudo "cp #{fetch(:deploy_to)}/../config/nginx/nginx.conf.default.#{fetch(:rails_env)} /etc/nginx/nginx.conf"
+      end
+    end
+
+    desc "Install requirements for a brand new server"
+    task :install_packages do
+      invoke 'server:setup:update_apt_get'
+      invoke 'server:setup:install_needed_tools'
+      invoke 'server:setup:install_unattended_upgrade'
+      invoke 'server:setup:install_node'
+      invoke 'server:setup:install_rails_dependencies'
+      invoke 'server:setup:install_redis'
+      invoke 'server:setup:install_nginx'
+      #invoke 'server:setup:install_java'
+      #invoke 'server:setup:install_elasticsearch'
+    end
+
+    desc "Install ruby"
+    task :install_ruby_env do
+      invoke 'server:setup:install_rbenv'
+      invoke 'server:setup:install_ruby'
+    end
+
+  end
+
+  namespace :admin do
+
+    desc "Install security updates"
+    task :install_security_updates do
+      on roles(:sysadmin) do
+        sudo "unattended-upgrade -y"
+      end
+    end
+
+    desc "Upgrade packages"
+    task :upgrade_packages do
+      on roles(:sysadmin) do
+        sudo "apt-get upgrade -y"
+      end
+    end
+
+  end
+
+end

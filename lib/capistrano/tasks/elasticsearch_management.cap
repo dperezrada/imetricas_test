@@ -1,0 +1,12 @@
+namespace :elasticsearch do
+
+  %w[start stop restart force-reload status].each do |command|
+    desc "#{command.capitalize} ElasticSearch Server."
+    task command do
+      on roles(:web) do
+        sudo "/etc/init.d/elasticsearch #{command}"
+      end
+    end
+  end
+
+end
