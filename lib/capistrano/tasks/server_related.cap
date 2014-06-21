@@ -113,7 +113,7 @@ namespace :server do
     desc "Copy nginx configuration into the server"
     task :copy_nginx_config do
       on roles(:sysadmin) do
-        sudo "cp #{fetch(:deploy_to)}/../config/nginx/nginx.conf.default.#{fetch(:rails_env)} /etc/nginx/nginx.conf"
+        sudo "cp #{fetch(:deploy_to)}/config/nginx/nginx.conf.default.#{fetch(:rails_env)} /etc/nginx/nginx.conf"
       end
     end
 

@@ -29,10 +29,6 @@ http {
 
     #include /etc/nginx/conf.d/*.conf;
 
-    server {
-            listen 80;
-            return 301 https://$host$request_uri;
-    }
 
     upstream app_server {
 	    # fail_timeout=0 means we always retry an upstream even if it failed
@@ -50,13 +46,9 @@ http {
 
     server {
     # enable one of the following if you're on Linux or FreeBSD
-    listen 443 default deferred; # for Linux
+     listen 80;
 
-    ssl on;
-    ssl_certificate /etc/ssl/api.epistemonikos.org.crt;
-    ssl_certificate_key /etc/ssl/api.epistemonikos.org.key;
-
-    server_name api.epistemonikos.org;
+    ssl off;
 
     client_max_body_size 4G;
 
