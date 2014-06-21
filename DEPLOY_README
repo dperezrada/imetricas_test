@@ -1,6 +1,13 @@
+#IN SERVER
 sudo groupadd deployers
 sudo useradd deploy
 sudo usermod -a -G deployers deploy
 mkdir -p /var/deploy
 sudo chown deploy:deployers /var/deploy/
 sudo chmod -R g+w /var/deploy/
+
+#IN PROJECT
+#Gemfile
+gem 'capistrano', group: :development
+#execute
+cap install
