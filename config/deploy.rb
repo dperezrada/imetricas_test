@@ -8,7 +8,7 @@ set :repo_url, 'git@github.com:dperezrada/imetricas_test.git'
 ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }
 
 # Default deploy_to directory is /var/www/my_app
-set :deploy_to, '/var/www/imetricas_test'
+set :deploy_to, '/var/www'
 
 # Default value for :scm is :git
 set :scm, :git
@@ -25,7 +25,7 @@ set :branch, "master"
 set :pty, true
 
 # Default value for :linked_files is []
-set :linked_files, %w{config/database.yml config/database.yml}
+set :linked_files, %w{config/database.yml }
 
 # Default value for linked_dirs is []
 # set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}

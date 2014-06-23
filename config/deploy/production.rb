@@ -18,8 +18,7 @@
 # extended properties on the server.
 # server 'example.com', user: 'deploy', roles: %w{web app}, my_property: :my_value
 
-server 'ec2-54-91-215-36.compute-1.amazonaws.com', user: 'deploy', roles: %w{web app}
-# server 'ec2-54-91-215-36.compute-1.amazonaws.com', user: 'ubuntu', roles: %w{sysadmin}
+server 'ec2-54-204-70-35.compute-1.amazonaws.com', user: 'deploy', roles: %w{web app}
 
 set :stage, :production
 set :rails_env, 'production'
