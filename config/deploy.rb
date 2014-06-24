@@ -1,8 +1,16 @@
 # config valid only for Capistrano 3.1
 lock '3.1.0'
 
-set :whenever_environment, ->{ "#{fetch(:stage)}" }
-set :whenever_identifier, ->{ "#{fetch(:application)}_#{fetch(:stage)}" }
+
+# Whenever config
+set :whenever_roles,        ->{ :db }
+set :whenever_command,      ->{ [:bundle, :exec, :whenever] }
+set :whenever_command_environment_variables, ->{ {} }
+set :whenever_identifier,   ->{ fetch :application }
+set :whenever_environment,  ->{ fetch :rails_env, "production" }
+set :whenever_variables,    ->{ "environment=#{fetch :whenever_environment}" }
+set :whenever_update_flags, ->{ "--update-crontab #{fetch :whenever_identifier} --set #{fetch :whenever_variables}" }
+set :whenever_clear_flags,  ->{ "--clear-crontab #{fetch :whenever_identifier}" }
 require "whenever/capistrano"
 
 set :application, 'imetricas_test'

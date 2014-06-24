@@ -8,8 +8,7 @@
 # set :output, "/path/to/my/cron_log.log"
 #
 every 1.minutes do
-	command "date >> /tmp/lala1"
-	command 'echo "hola\n" >> /tmp/lala1'
+	rake "hola:tarea1"
 end
 #   command "/usr/bin/some_great_command"
 #   runner "MyModel.some_method"
