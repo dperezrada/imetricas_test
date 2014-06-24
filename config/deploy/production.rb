@@ -8,7 +8,7 @@
 # role :app, %w{deploy@ec2-54-91-215-36.compute-1.amazonaws.com}
 # role :sysadmin, %w{ubuntu@ec2-54-91-215-36.compute-1.amazonaws.com}
 # role :web, %w{deploy@example.com}
-# role :db,  %w{deploy@example.com}
+# role :db,  %w{deploy@ec2-54-204-70-35.compute-1.amazonawm.com}
 
 # Extended Server Syntax
 # ======================
@@ -18,7 +18,7 @@
 # extended properties on the server.
 # server 'example.com', user: 'deploy', roles: %w{web app}, my_property: :my_value
 
-server 'ec2-54-204-70-35.compute-1.amazonaws.com', user: 'deploy', roles: %w{web app}
+server '54.204.70.35', user: 'deploy', roles: %w{web app db}
 
 set :stage, :production
 set :rails_env, 'production'
